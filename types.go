@@ -559,6 +559,10 @@ type (
 		Amount             *PurchaseUnitAmount `json:"amount,omitempty"`
 		Payments           *CapturedPayments   `json:"payments,omitempty"`
 		PaymentInstruction *PaymentInstruction `json:"payment_instruction,omitempty"`
+		Payee              *PayeeForOrders     `json:"payee,omitempty"`
+		Description        string              `json:"description,omitempty"`
+		CustomID           string              `json:"custom_id,omitempty"`
+		Shipping           ShippingDetail      `json:"shipping,omitempty"`
 	}
 
 	// TaxInfo used for orders.
