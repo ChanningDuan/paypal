@@ -5,22 +5,33 @@ import (
 	"fmt"
 )
 
-// CreateBillingAgreementToken - Use this call to create a billing agreement
+// CreatePaypalBillingAgreementToken - Use this call to create a billing agreement token
+// Endpoint: POST /v1/billing-agreements/agreement-tokens
+// Deprecated: use CreateBillingAgreementToken instead
+func (c *Client) CreatePaypalBillingAgreementToken(
+	ctx context.Context,
+	description *string,
+	shippingAddress *ShippingAddress,
+	payer *Payer,
+	plan *BillingPlan,
+) (*BillingAgreementToken, error) {
+	return c.CreateBillingAgreementToken(ctx, description, shippingAddress, payer, plan)
+}
+
+// CreateBillingAgreementToken - Use this call to create a billing agreement token
 // Endpoint: POST /v1/billing-agreements/agreement-tokens
 func (c *Client) CreateBillingAgreementToken(
 	ctx context.Context,
-	name string,
-	description string,
-	startDate string,
+	description *string,
+	shippingAddress *ShippingAddress,
 	payer *Payer,
 	plan *BillingPlan,
 ) (*BillingAgreementToken, error) {
 	type createBARequest struct {
-		Name        string       `json:"name"`
-		Description string       `json:"description"`
-		StartDate   string       `json:"start_date"`
-		Payer       *Payer       `json:"payer"`
-		Plan        *BillingPlan `json:"plan"`
+		Description     *string          `json:"description,omitempty"`
+		ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
+		Payer           *Payer           `json:"payer"`
+		Plan            *BillingPlan     `json:"plan"`
 	}
 
 	billingAgreementToken := &BillingAgreementToken{}
@@ -29,7 +40,7 @@ func (c *Client) CreateBillingAgreementToken(
 		ctx,
 		"POST",
 		fmt.Sprintf("%s%s", c.APIBase, "/v1/billing-agreements/agreement-tokens"),
-		createBARequest{Name: name, Description: description, StartDate: startDate, Payer: payer, Plan: plan})
+		createBARequest{Description: description, ShippingAddress: shippingAddress, Payer: payer, Plan: plan})
 	if err != nil {
 		return nil, err
 	}
@@ -41,17 +52,27 @@ func (c *Client) CreateBillingAgreementToken(
 	return billingAgreementToken, nil
 }
 
+// CreatePaypalBillingAgreementFromToken - Use this call to create a billing agreement
+// Endpoint: POST /v1/billing-agreements/agreements
+// Deprecated: use CreateBillingAgreementFromToken instead
+func (c *Client) CreatePaypalBillingAgreementFromToken(
+	ctx context.Context,
+	tokenID string,
+) (*BillingAgreementFromToken, error) {
+	return c.CreateBillingAgreementFromToken(ctx, tokenID)
+}
+
 // CreateBillingAgreementFromToken - Use this call to create a billing agreement
 // Endpoint: POST /v1/billing-agreements/agreements
 func (c *Client) CreateBillingAgreementFromToken(
 	ctx context.Context,
 	tokenID string,
-) (*BillingAgreement, error) {
+) (*BillingAgreementFromToken, error) {
 	type createBARequest struct {
 		TokenID string `json:"token_id"`
 	}
 
-	billingAgreement := &BillingAgreement{}
+	billingAgreement := &BillingAgreementFromToken{}
 
 	req, err := c.NewRequest(
 		ctx,
@@ -67,4 +88,28 @@ func (c *Client) CreateBillingAgreementFromToken(
 	}
 
 	return billingAgreement, nil
+}
+
+// CancelBillingAgreement - Use this call to cancel a billing agreement
+// Endpoint: POST /v1/billing-agreements/agreements/{agreement_id}/cancel
+func (c *Client) CancelBillingAgreement(
+	ctx context.Context,
+	billingAgreementID string,
+) error {
+	type cancelBARequest struct{}
+
+	req, err := c.NewRequest(
+		ctx,
+		"POST",
+		fmt.Sprintf("%s%s%s%s", c.APIBase, "/v1/billing-agreements/agreements/", billingAgreementID, "/cancel"),
+		cancelBARequest{})
+	if err != nil {
+		return err
+	}
+
+	if err = c.SendWithAuth(req, nil); err != nil {
+		return err
+	}
+
+	return nil
 }

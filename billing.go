@@ -20,34 +20,40 @@ type (
 		Links               []Link              `json:"links,omitempty"`
 	}
 
-	// CreateBillingResp deprecated, use CreateBillingResponse instead.
+	// CreateBillingResp.
+	//
+	// Deprecated: use CreateBillingResponse instead.
 	CreateBillingResp = CreateBillingResponse
 
 	// CreateAgreementResponse struct
 	CreateAgreementResponse struct {
 		Name        string      `json:"name,omitempty"`
 		Description string      `json:"description,omitempty"`
-	 	Plan        BillingPlan `json:"plan,omitempty"`
+		Plan        BillingPlan `json:"plan,omitempty"`
 		Links       []Link      `json:"links,omitempty"`
 		StartTime   time.Time   `json:"start_time,omitempty"`
 	}
 
-	// CreateAgreementResp is deprecated, use CreateAgreementResponse instead.
-	CreateAgreementResp =  CreateAgreementResponse
+	// CreateAgreementResp.
+	//
+	// Deprecated: use CreateAgreementResponse instead.
+	CreateAgreementResp = CreateAgreementResponse
 
-	// BillingPlanListParams struct
+	// BillingPlanListParams
 	BillingPlanListParams struct {
 		ListParams
 		Status string `json:"status,omitempty"` //Allowed values: CREATED, ACTIVE, INACTIVE, ALL.
 	}
 
-	//BillingPlanListResponse struct
+	// BillingPlanListResponse
 	BillingPlanListResponse struct {
 		SharedListResponse
 		Plans []BillingPlan `json:"plans,omitempty"`
 	}
 
-	// BillingPlanListResp is deprecated, use BillingPlanListResponse instead.
+	// BillingPlanListResp.
+	//
+	// Deprecated: use BillingPlanListResponse instead.
 	BillingPlanListResp = BillingPlanListResponse
 )
 
@@ -94,6 +100,7 @@ func (c *Client) ActivatePlan(ctx context.Context, planID string) error {
 
 // CreateBillingAgreement creates an agreement for specified plan
 // Endpoint: POST /v1/payments/billing-agreements
+// Deprecated: Use POST /v1/billing-agreements/agreements
 func (c *Client) CreateBillingAgreement(ctx context.Context, a BillingAgreement) (*CreateAgreementResponse, error) {
 	// PayPal needs only ID, so we will remove all fields except Plan ID
 	a.Plan = BillingPlan{

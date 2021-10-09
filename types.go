@@ -328,24 +328,19 @@ type (
 		OverrideMerchantPreferences *MerchantPreferences `json:"override_merchant_preferences,omitempty"`
 	}
 
-	// BillingAgreementToken response struct
-	BillingAgreementToken struct {
-		ID                          string               `json:"id,omitempty"`
-		Name                        string               `json:"name,omitempty"`
-		Description                 string               `json:"description,omitempty"`
-		StartDate                   string               `json:"start_date,omitempty"`
-		AgreementDetails            *AgreementDetails    `json:"agreement_details,omitempty"`
-		Payer                       *Payer               `json:"payer,omitempty"`
-		ShippingAddress             *ShippingAddress     `json:"shipping_address,omitempty"`
-		OverrideMerchantPreferences *MerchantPreferences `json:"override_merchant_preferences,omitempty"`
-		OverrideChargeModels        *OverrideChargeModel `json:"override_charge_models,omitempty"`
-		Plan                        *Plan                `json:"plan,omitempty"`
+	// BillingAgreementFromToken struct
+	BillingAgreementFromToken struct {
+		ID          string      `json:"id,omitempty"`
+		Description string      `json:"description,omitempty"`
+		Payer       *Payer      `json:"payer,omitempty"`
+		Plan        BillingPlan `json:"plan,omitempty"`
+		Links       []Link      `json:"links,omitempty"`
 	}
 
-	//OverrideChargeModel struct
-	OverrideChargeModel struct {
-		ChargeID string  `json:"charge_id"`
-		Amount   *Amount `json:"amount"`
+	// BillingAgreementToken response struct
+	BillingAgreementToken struct {
+		Links   []Link `json:"links,omitempty"`
+		TokenID string `json:"token_id,omitempty"`
 	}
 
 	// Plan struct
@@ -587,12 +582,17 @@ type (
 	PurchaseUnit struct {
 		ReferenceID        string              `json:"reference_id"`
 		Amount             *PurchaseUnitAmount `json:"amount,omitempty"`
+		Payee              *PayeeForOrders     `json:"payee,omitempty"`
 		Payments           *CapturedPayments   `json:"payments,omitempty"`
 		PaymentInstruction *PaymentInstruction `json:"payment_instruction,omitempty"`
 		Payee              *PayeeForOrders     `json:"payee,omitempty"`
 		Description        string              `json:"description,omitempty"`
 		CustomID           string              `json:"custom_id,omitempty"`
-		Shipping           ShippingDetail      `json:"shipping,omitempty"`
+		InvoiceID          string              `json:"invoice_id,omitempty"`
+		ID                 string              `json:"id,omitempty"`
+		SoftDescriptor     string              `json:"soft_descriptor,omitempty"`
+		Shipping           *ShippingDetail     `json:"shipping,omitempty"`
+		Items              []Item              `json:"items,omitempty"`
 	}
 
 	// TaxInfo used for orders.
@@ -687,6 +687,7 @@ type (
 
 	// CaptureAmount struct
 	CaptureAmount struct {
+		Status                    string                     `json:"status,omitempty"`
 		ID                        string                     `json:"id,omitempty"`
 		CustomID                  string                     `json:"custom_id,omitempty"`
 		Amount                    *PurchaseUnitAmount        `json:"amount,omitempty"`
@@ -721,11 +722,13 @@ type (
 
 	// PayerWithNameAndPhone struct
 	PayerWithNameAndPhone struct {
-		Name         *CreateOrderPayerName `json:"name,omitempty"`
-		EmailAddress string                `json:"email_address,omitempty"`
-		Phone        *PhoneWithType        `json:"phone,omitempty"`
-		PayerID      string                `json:"payer_id,omitempty"`
-		Address      Address               `json:"address,omitempty"`
+		Name         *CreateOrderPayerName          `json:"name,omitempty"`
+		EmailAddress string                         `json:"email_address,omitempty"`
+		Phone        *PhoneWithType                 `json:"phone,omitempty"`
+		PayerID      string                         `json:"payer_id,omitempty"`
+		BirthDate    string                         `json:"birth_date,omitempty"`
+		TaxInfo      *TaxInfo                       `json:"tax_info,omitempty"`
+		Address      *ShippingDetailAddressPortable `json:"address,omitempty"`
 	}
 
 	// CaptureOrderResponse is the response for capture order
@@ -801,8 +804,8 @@ type (
 
 	// PaymentSource structure
 	PaymentSource struct {
-		Card  *PaymentSourceCard  `json:"card"`
-		Token *PaymentSourceToken `json:"token"`
+		Card  *PaymentSourceCard  `json:"card,omitempty"`
+		Token *PaymentSourceToken `json:"token,omitempty"`
 	}
 
 	// PaymentSourceCard structure
@@ -891,6 +894,7 @@ type (
 		ID     string              `json:"id,omitempty"`
 		Amount *PurchaseUnitAmount `json:"amount,omitempty"`
 		Status string              `json:"status,omitempty"`
+		Links  []Link              `json:"links,omitempty"`
 	}
 
 	// Related struct
@@ -1136,8 +1140,16 @@ type (
 		Value     interface{} `json:"value"`
 	}
 
+	// Resource is a mix of fields from several webhook resource types.
+	//
+	// Deprecated: Add implementation of specific resource types in your own
+	// code and don't use this catch all struct, you show know which resource
+	// type you are expecting and handle that type only.
+	//
+	// Every resource struct type should be unique for every combination of
+	// "resource_type"/"resource_version" combination of the Event type /
+	// webhook message.
 	Resource struct {
-		// Payment Resource type
 		ID                        string                     `json:"id,omitempty"`
 		Status                    string                     `json:"status,omitempty"`
 		StatusDetails             *CaptureStatusDetails      `json:"status_details,omitempty"`
@@ -1173,6 +1185,10 @@ type (
 		Operations            []Operation            `json:"operations,omitempty"`
 		Products              []string               `json:"products,omitempty"`
 		LegalConsents         []Consent              `json:"legal_consents,omitempty"`
+	}
+
+	ReferralResponse struct {
+		Links []Link `json:"links,omitempty"`
 	}
 
 	PartnerConfigOverride struct {
