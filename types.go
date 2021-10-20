@@ -585,7 +585,6 @@ type (
 		Payee              *PayeeForOrders     `json:"payee,omitempty"`
 		Payments           *CapturedPayments   `json:"payments,omitempty"`
 		PaymentInstruction *PaymentInstruction `json:"payment_instruction,omitempty"`
-		Payee              *PayeeForOrders     `json:"payee,omitempty"`
 		Description        string              `json:"description,omitempty"`
 		CustomID           string              `json:"custom_id,omitempty"`
 		InvoiceID          string              `json:"invoice_id,omitempty"`
@@ -993,7 +992,19 @@ type (
 		Type         string         `json:"token_type"`
 		ExpiresIn    expirationTime `json:"expires_in"`
 	}
+	SellerAccessToken struct {
+		Scope        string `json:"scope"`
+		AccessToken  string `json:"access_token"`
+		TokenType    string `json:"token_type"`
+		ExpiresIn    int    `json:"expires_in"`
+		RefreshToken string `json:"refresh_token"`
+		Nonce        string `json:"nonce"`
+	}
 
+	 SellerCredentials struct {
+	ClientId     string `json:"client_id"`
+	ClientSecret string `json:"client_secret"`
+	}
 	// Transaction struct
 	Transaction struct {
 		Amount           *Amount         `json:"amount"`
@@ -1211,11 +1222,17 @@ type (
 	RestAPIIntegration struct {
 		IntegrationMethod string            `json:"integration_method"`
 		IntegrationType   string            `json:"integration_type"`
-		ThirdPartyDetails ThirdPartyDetails `json:"third_party_details"`
+		ThirdPartyDetails *ThirdPartyDetails `json:"third_party_details,omitempty"`
+		FirstPartyDetails *FirstPartyDetails `json:"first_party_details,omitempty"`
 	}
 
 	ThirdPartyDetails struct {
 		Features []string `json:"features"`
+	}
+
+	FirstPartyDetails struct {
+		Features []string `json:"features"`
+		SellerNonce string `json:"seller_nonce"`
 	}
 
 	Consent struct {

@@ -117,13 +117,15 @@ func (c *Client) Send(req *http.Request, v interface{}) error {
 
 		return errResp
 	}
+
+
 	if v == nil {
 		return nil
 	}
 
 	if w, ok := v.(io.Writer); ok {
-		io.Copy(w, resp.Body)
-		return nil
+		_, err := io.Copy(w, resp.Body)
+		return err
 	}
 
 	return json.NewDecoder(resp.Body).Decode(v)
@@ -191,7 +193,6 @@ func (c *Client) log(r *http.Request, resp *http.Response) {
 		if resp != nil {
 			respDump, _ = httputil.DumpResponse(resp, true)
 		}
-
 		c.Log.Write([]byte(fmt.Sprintf("Request: %s\nResponse: %s\n", reqDump, string(respDump))))
 	}
 }
