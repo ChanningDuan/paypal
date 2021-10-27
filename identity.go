@@ -74,27 +74,27 @@ func (c *Client) GetUserInfo(ctx context.Context, schema string) (*UserInfo, err
 	return u, nil
 }
 
-func (c *Client) GetSellerAccessToken(ctx context.Context,shareId,authCode, sellerNonce string) (*SellerAccessToken,error) {
+func (c *Client) GetSellerAccessToken(ctx context.Context, shareId, authCode, sellerNonce string) (*SellerAccessToken, error) {
 
 	token := &SellerAccessToken{}
 
-	buf := bytes.NewBuffer([]byte(fmt.Sprintf("grant_type=authorization_code&code=%s&code_verifier=%s", authCode,sellerNonce)))
+	buf := bytes.NewBuffer([]byte(fmt.Sprintf("grant_type=authorization_code&code=%s&code_verifier=%s", authCode, sellerNonce)))
 	req, err := http.NewRequestWithContext(ctx, "POST", fmt.Sprintf("%s%s", c.APIBase, "/v1/oauth2/token"), buf)
 	if err != nil {
 		return token, err
 	}
 
-	basic := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:",shareId)))
-	req.Header.Set("Authorization","Basic " + basic)
-	err = c.Send(req, token);
-	if  err != nil {
+	basic := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:", shareId)))
+	req.Header.Set("Authorization", "Basic "+basic)
+	err = c.Send(req, token)
+	if err != nil {
 		return token, err
 	}
 
 	return token, nil
 }
 
-func (c *Client) GetSellerCredentials(ctx context.Context,sellerAccessToken,partnerMerchantId string) (*SellerCredentials,error) {
+func (c *Client) GetSellerCredentials(ctx context.Context, sellerAccessToken, partnerMerchantId string) (*SellerCredentials, error) {
 
 	credentials := &SellerCredentials{}
 	uri := fmt.Sprintf("/v1/customer/partners/%s/merchant-integrations/credentials/", partnerMerchantId)
@@ -102,7 +102,7 @@ func (c *Client) GetSellerCredentials(ctx context.Context,sellerAccessToken,part
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s",sellerAccessToken))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", sellerAccessToken))
 
 	if err = c.SendWithAuth(req, credentials); err != nil {
 		return credentials, err
